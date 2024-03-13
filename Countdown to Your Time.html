@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Countdown to Your Time</title>
+  <style>
+    body {
+      background: linear-gradient(90deg, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    #countdown {
+      font-size: 50px;
+      text-shadow: 2px 2px 4px #000000;
+    }
+
+    button {
+      cursor: pointer;
+      background-color: #555555;
+      border: none;
+      color: white;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 4px 2px;
+      transition-duration: 0.4s;
+    }
+
+    button:hover {
+      background-color: #888888;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+  <div>
+    <h1>Countdown to Your Time</h1>
+    <p id="countdown"></p>
+
+    <input type="time" id="timeInput" value="18:30">
+    <button onclick="setTargetTime()">Set Time</button>
+    <button onclick="openFullscreen()">Full screen</button>
+  </div>
+
+  <script>
+    let targetTime = new Date();
+    targetTime.setHours(18, 30, 0);
+
+    function setTargetTime() {
+      const timeInput = document.getElementById("timeInput").value;
+      const [hours, minutes] = timeInput.split(":");
+      targetTime.setHours(hours, minutes, 0);
+    }
+
+    function updateCountdown() {
+      const currentTime = new Date();
+      const timeLeft = targetTime - currentTime;
+
+      if (timeLeft > 0) {
+        const seconds = Math.floor(timeLeft / 1000);
+        document.getElementById("countdown").textContent = `倒计时：${seconds} 秒`;
+      } else {
+        document.getElementById("countdown").textContent = "已到达下班时间！";
+      }
+    }
+
+    // 每秒更新一次倒计时
+    setInterval(updateCountdown, 1000);
+
+
+    function openFullscreen() {
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen();
+      } else if (document.documentElement.mozRequestFullScreen) { /* Firefox */
+        document.documentElement.mozRequestFullScreen();
+      } else if (document.documentElement.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+        document.documentElement.webkitRequestFullscreen();
+      } else if (document.documentElement.msRequestFullscreen) { /* IE/Edge */
+        document.documentElement.msRequestFullscreen();
+      }
+    }
+
+  </script>
+</body>
+
+</html>
