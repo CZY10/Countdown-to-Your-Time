@@ -6,8 +6,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Countdown to Your Time</title>
   <style>
+    @keyframes gradient {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
     body {
-      background: linear-gradient(90deg, #0f2027, #203a43, #2c5364);
+      background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #3e738e);
+      background-size: 400% 400%;
+      animation: gradient 5s ease infinite;
       color: #fff;
       font-family: Arial, sans-serif;
       display: flex;
