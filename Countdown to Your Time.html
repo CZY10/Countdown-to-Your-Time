@@ -437,18 +437,19 @@
 
     <div id="progress-bar"></div>
 
+    <div>
+      <span>到达时间：</span>
+      <input type="time" id="timeInput" value="18:30">
+      <button onclick="setTargetTime()">Set Time</button>
+      <button onclick="openFullscreen()">Full screen</button>
+    </div>
+
     <div style="display: flex;justify-content: space-between;">
       <div id="clock" class="tracking-in-expand">
         00:00:00
       </div>
 
       <div class="tracking-in-expand" style="font-family: fangsong;">开发者:陈子扬</div>
-    </div>
-
-    <div>
-      <input type="time" id="timeInput" value="18:30">
-      <button onclick="setTargetTime()">Set Time</button>
-      <button onclick="openFullscreen()">Full screen</button>
     </div>
 
     <div style="display: flex;align-items: center;">
