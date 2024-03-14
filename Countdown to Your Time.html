@@ -66,6 +66,7 @@
       align-items: center;
       height: 100vh;
       margin: 0;
+      padding: 20px
     }
 
     #countdown {
@@ -474,8 +475,10 @@
       console.log(hours, minutes);
       targetTime.setHours(hours, minutes, 0);
 
+      clearInterval(setInterval1)
       clearInterval(setInterval2)
       updateProgressBar(hours * 1, minutes * 1)
+      setInterval1 = setInterval(updateCountdown, 1000);
     }
 
     function updateCountdown() {
@@ -489,7 +492,7 @@
         document.getElementById("countdown").textContent = "已到达下班时间！";
         clearInterval(setInterval1)
         clearInterval(setInterval2)
-        setTargetTime(() => alert("已到达下班时间！"), 2000)
+        setTimeout(() => alert("已到达下班时间！"), 2000)
       }
     }
 
