@@ -73,6 +73,7 @@
       text-shadow: 2px 2px 4px #000000;
       font-family: fangsong;
       margin: 0;
+      min-height: 46px;
     }
 
     button {
@@ -420,12 +421,18 @@
         text-shadow: 0 0 30px rgba(255, 255, 255, 0.6), 0 0 60px rgba(255, 255, 255, 0.45), 0 0 110px rgba(255, 255, 255, 0.25), 0 0 100px rgba(255, 255, 255, 0.1);
       }
     }
+
+    #myText {
+      transition: opacity 0.5s;
+      opacity: 0;
+      font-size: 12px;
+    }
   </style>
 </head>
 
 <body>
-  <div class="text-flicker-in-glow">
-    <h1 class="tracking-in-expand">Countdown to Your Time</h1>
+  <div>
+    <h1 class="text-flicker-in-glow">Countdown to Your Time</h1>
     <p id="countdown" class="tracking-in-expand"></p>
 
     <div id="progress-bar"></div>
@@ -435,13 +442,20 @@
         00:00:00
       </div>
 
-      <div class="tracking-in-expand" style="font-family: fangsong;">陈子扬</div>
+      <div class="tracking-in-expand" style="font-family: fangsong;">开发者:陈子扬</div>
     </div>
 
     <div>
       <input type="time" id="timeInput" value="18:30">
       <button onclick="setTargetTime()">Set Time</button>
       <button onclick="openFullscreen()">Full screen</button>
+    </div>
+
+    <div style="display: flex;align-items: center;">
+      <button onclick="myFunction()">Click</button>
+      <p id="myText"><span>此产品主要是给上班开无聊的人使用</span><br>
+        <span>(2002年11月15日出生在咸宁的刘濛是傻逼)</span>
+      </p>
     </div>
   </div>
 
@@ -474,8 +488,7 @@
         document.getElementById("countdown").textContent = "已到达下班时间！";
         clearInterval(setInterval1)
         clearInterval(setInterval2)
-        alert("已到达下班时间！")
-        fadeOutEffect()
+        setTargetTime(() => alert("已到达下班时间！"), 2000)
       }
     }
 
@@ -546,19 +559,14 @@
 
     setInterval2 = setInterval(updateProgressBar(18, 30), 1000);
 
-    function fadeOutEffect() {
-      var fadeTarget = document.body;
-      var fadeEffect = setInterval(function () {
-        if (!fadeTarget.style.opacity) {
-          fadeTarget.style.opacity = 1;
-        }
-        if (fadeTarget.style.opacity > 0) {
-          fadeTarget.style.opacity -= 0.1;
-        } else {
-          fadeTarget.style.background = '#000'
-          clearInterval(fadeEffect);
-        }
-      }, 200);
+    function myFunction() {
+      var x = document.getElementById("myText");
+      console.log(x.style.opacity);
+      if (x.style.opacity == "" || x.style.opacity == '0') {
+        x.style.opacity = 1;
+      } else {
+        x.style.opacity = 0;
+      }
     }
 
   </script>
