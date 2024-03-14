@@ -56,9 +56,9 @@
     }
 
     body {
-      background: linear-gradient(-45deg, #000000, #2b3336, #456776, #15303d);
+      background: linear-gradient(-90deg, #2c2c2c, #3d3d3d, #636363, #7b7b7b);
       background-size: 400% 400%;
-      animation: gradient 3s ease infinite;
+      animation: gradient 5s ease infinite;
       color: #fff;
       font-family: Arial, sans-serif;
       display: flex;
@@ -69,10 +69,10 @@
     }
 
     #countdown {
-      font-size: 50px;
+      font-size: 40px;
       text-shadow: 2px 2px 4px #000000;
-      min-height: 42px;
-      line-height: 42px;
+      font-family: fangsong;
+      margin: 0;
     }
 
     button {
@@ -424,31 +424,43 @@
 </head>
 
 <body>
-  <div>
+  <div class="text-flicker-in-glow">
     <h1 class="tracking-in-expand">Countdown to Your Time</h1>
     <p id="countdown" class="tracking-in-expand"></p>
+
+    <div id="progress-bar"></div>
 
     <div style="display: flex;justify-content: space-between;">
       <div id="clock" class="tracking-in-expand">
         00:00:00
       </div>
 
-      <div class="text-flicker-in-glow">陈子扬</div>
+      <div class="tracking-in-expand" style="font-family: fangsong;">陈子扬</div>
     </div>
 
-    <input type="time" id="timeInput" value="18:30">
-    <button onclick="setTargetTime()">Set Time</button>
-    <button onclick="openFullscreen()">Full screen</button>
+    <div>
+      <input type="time" id="timeInput" value="18:30">
+      <button onclick="setTargetTime()">Set Time</button>
+      <button onclick="openFullscreen()">Full screen</button>
+    </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/progressbar.js"></script>
   <script>
+    let setInterval1 = null
+    let setInterval2 = null
+
     let targetTime = new Date();
     targetTime.setHours(18, 30, 0);
 
     function setTargetTime() {
       const timeInput = document.getElementById("timeInput").value;
       const [hours, minutes] = timeInput.split(":");
+      console.log(hours, minutes);
       targetTime.setHours(hours, minutes, 0);
+
+      clearInterval(setInterval2)
+      updateProgressBar(hours * 1, minutes * 1)
     }
 
     function updateCountdown() {
@@ -460,11 +472,15 @@
         document.getElementById("countdown").textContent = `倒计时：${seconds} 秒`;
       } else {
         document.getElementById("countdown").textContent = "已到达下班时间！";
+        clearInterval(setInterval1)
+        clearInterval(setInterval2)
+        alert("已到达下班时间！")
+        fadeOutEffect()
       }
     }
 
     // 每秒更新一次倒计时
-    setInterval(updateCountdown, 1000);
+    setInterval1 = setInterval(updateCountdown, 1000);
 
     function openFullscreen() {
       if (document.documentElement.requestFullscreen) {
@@ -498,7 +514,55 @@
 
     // Start the clock
     updateClock();
+
+    var bar = new ProgressBar.Line('#progress-bar', {
+      strokeWidth: 4,
+      easing: 'easeInOut',
+      duration: 1400,
+      color: '#999',
+      trailColor: '#eee',
+      trailWidth: 1,
+      svgStyle: { width: '100%', height: '100%' }
+    });
+
+    function updateProgressBar(a, b) {
+      var now = new Date();
+      console.log(now);
+      var end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), a, b, 0);
+      var start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 9, 0, 0);
+
+      if (now > end) {
+        end.setDate(end.getDate() + 1);
+        start.setDate(start.getDate() + 1);
+      }
+
+      var total = end - start;
+      var elapsed = now - start;
+
+      var progress = elapsed / total;
+
+      bar.animate(progress);  // Number from 0.0 to 1.0
+    }
+
+    setInterval2 = setInterval(updateProgressBar(18, 30), 1000);
+
+    function fadeOutEffect() {
+      var fadeTarget = document.body;
+      var fadeEffect = setInterval(function () {
+        if (!fadeTarget.style.opacity) {
+          fadeTarget.style.opacity = 1;
+        }
+        if (fadeTarget.style.opacity > 0) {
+          fadeTarget.style.opacity -= 0.1;
+        } else {
+          fadeTarget.style.background = '#000'
+          clearInterval(fadeEffect);
+        }
+      }, 200);
+    }
+
   </script>
+
 </body>
 
 </html>
