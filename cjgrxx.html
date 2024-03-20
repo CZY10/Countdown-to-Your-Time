@@ -2,6 +2,7 @@
 <html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>中门小坑相亲网</title>
 
 <head>
     <style>
@@ -27,6 +28,8 @@
 
         .title {
             font-size: 20px;
+            display: flex;
+            justify-content: space-between;
         }
 
         .profile {
@@ -138,7 +141,8 @@
 
 <body>
     <div style="padding: 40px;">
-        <div class="title">相亲网站:</div>
+        <div class="title">相亲网站: <button class="contact-button" style="margin: 0;"
+                onclick="clickswitch()">切换相亲人选</button></div>
         <div class="profile">
             <img src="./img/lQDPKGxHy_bIYnnNAyDNAcKwQ86JztFfLJwF6FZeLwANAA_450_800.jpg" alt="Profile Photo">
             <div>
@@ -200,6 +204,10 @@
 
         function goctyt() {
             window.location.href = window.location.origin + '/Countdown-to-Your-Time/Countdown to Your Time.html'
+        }
+
+        function clickswitch() {
+            window.location.href = window.location.origin + '/Countdown-to-Your-Time/gygrxx.html'
         }
     </script>
 </body>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>中门小坑相亲网</title>
+
+<head>
+    <style>
+        @keyframes backgroundChange {
+            0% {
+                background-color: #282828;
+            }
+
+            50% {
+                background-color: #383838;
+            }
+
+            100% {
+                background-color: #282828;
+            }
+        }
+
+        body {
+            animation: backgroundChange 5s infinite;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+
+        .title {
+            font-size: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .profile {
+            display: flex;
+            margin-top: 50px;
+        }
+
+        .profile img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 20px;
+            transition: transform 0.3s ease;
+            animation: scale 2s infinite;
+        }
+
+        @keyframes scale {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.3);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .profile h1 {
+            font-size: 24px;
+            margin-top: 10px;
+            min-width: 100px;
+            text-align: left;
+        }
+
+        .profile p {
+            font-size: 16px;
+            margin-top: 5px;
+            min-width: 100px;
+            text-align: left;
+        }
+
+        .text {
+            font-size: 14px;
+        }
+
+        .contact-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #444;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* The Modal (background) */
+        .modal {
+            display: none;
+            /* Hidden by default */
+            position: fixed;
+            /* Stay in place */
+            z-index: 1;
+            /* Sit on top */
+            padding-top: 100px;
+            /* Location of the box */
+            left: 0;
+            top: 0;
+            width: 100%;
+            /* Full width */
+            height: 100%;
+            /* Full height */
+            overflow: auto;
+            /* Enable scroll if needed */
+            background-color: rgb(0, 0, 0);
+            /* Fallback color */
+            background-color: rgba(0, 0, 0, 0.4);
+            /* Black w/ opacity */
+        }
+
+        /* Modal Content */
+        .modal-content {
+            background-color: #282828;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+
+        /* The Close Button */
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="padding: 40px;">
+        <div class="title">相亲网站: <button class="contact-button" style="margin: 0;"
+                onclick="clickswitch()">切换相亲人选</button></div>
+        <div class="profile">
+            <img src="./img/lQDPJyDG2IwtDfnM-sz6sJXJyPVYfD16Behyb9cmSAA_250_250.jpg" alt="Profile Photo">
+            <div>
+                <h1>名字：郭溢</h1>
+                <p>职位：乞丐</p>
+                <p>住址：蛤蟆塘</p>
+            </div>
+        </div>
+
+        <div class="text">
+            <p>择偶标准：</p>
+
+            <p>1.爱好：必须喜欢星际探险，能和我一起穿越黑洞去未知世界。</p>
+            <p>2.特长：最好会五种外星语言，方便我们和外星人交流。</p>
+            <p>3.性格：必须有超级英雄般的正义感，能在我吃太多巧克力时及时止住我。</p>
+            <p>4.外貌：长得像月亮上的外星人，因为我觉得他们特别可爱。</p>
+
+            <p>承诺：</p>
+
+            <p>我会用我的时光机带你去任何你想去的时代。</p>
+            <p>我的巧克力收藏是无限的，你可以随意享用。</p>
+            <p>我保证，每次星际旅行回来，都会给你带特别的外星礼物。</p>
+
+            <p>备注：</p>
+
+            <p>如果你怕黑洞，我们可以改成穿越彩虹桥。
+                如果你不会外星语，没关系，我可以教你。</p>
+        </div>
+
+        <!-- Trigger/Open The Modal -->
+        <div>
+            <button class="contact-button" id="myBtn">点击查看联系方式</button>
+            <button class="contact-button" onclick="goctyt()">回到下班倒计时</button>
+        </div>
+
+        <!-- The Modal -->
+        <div id="myModal" class="modal">
+
+            <!-- Modal content -->
+            <div class="modal-content">
+                <span class="close">×</span>
+                <p>联系方式：123-456-7890</p>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Get the modal
+        var modal = document.getElementById("myModal");
+
+        // Get the button that opens the modal
+        var btn = document.getElementById("myBtn");
+
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+
+        // When the user clicks the button, open the modal 
+        btn.onclick = function () {
+            modal.style.display = "block";
+        }
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function () {
+            modal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        function goctyt() {
+            window.location.href = window.location.origin + '/Countdown-to-Your-Time/Countdown to Your Time.html'
+        }
+
+        function clickswitch() {
+            window.location.href = window.location.origin + '/Countdown-to-Your-Time/cjgrxx.html'
+        }
+    </script>
+</body>
+
+</html>
