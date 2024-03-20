@@ -154,7 +154,10 @@
         </div>
 
         <!-- Trigger/Open The Modal -->
-        <button class="contact-button" id="myBtn">点击查看联系方式</button>
+        <div>
+            <button class="contact-button" id="myBtn">点击查看联系方式</button>
+            <button class="contact-button" onclick="goctyt()">回到下班倒计时</button>
+        </div>
 
         <!-- The Modal -->
         <div id="myModal" class="modal">
@@ -193,6 +196,10 @@
             if (event.target == modal) {
                 modal.style.display = "none";
             }
+        }
+
+        function goctyt() {
+            window.location.href = window.location.origin + '/Countdown-to-Your-Time/Countdown to Your Time.html'
         }
     </script>
 </body>
