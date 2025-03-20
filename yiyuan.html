@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1元许愿星｜你的愿望已被宇宙签收</title>
+    <style>
+        /* 零成本视觉：深空背景+动态星星 */
+        body {
+            background: #0a0e24;
+            color: #fff;
+            font-family: system-ui;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .star {
+            animation: glow 2s infinite;
+            font-size: 40px;
+            margin: 20px;
+        }
+
+        @keyframes glow {
+
+            0%,
+            100% {
+                opacity: 0.3;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        .wish-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 300px;
+        }
+
+        textarea {
+            width: 90%;
+            height: 80px;
+            background: transparent;
+            border: 1px solid #4a6da7;
+            color: #fff;
+            padding: 10px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 动态星空仪式感 -->
+    <div class="star">🌌✨</div>
+
+    <h2>花1元点亮你的专属许愿星</h2>
+    <p>已有<span style="color:#ffd700">2143颗</span>愿望被宇宙接收</p>
+
+    <!-- 许愿输入框 -->
+    <div class="wish-box">
+        <textarea id="wishText" placeholder="写下你的愿望（42字以内）"></textarea>
+        <p style="font-size:0.9em;color:#888">* 愿望越具体，宇宙越容易响应</p>
+    </div>
+
+    <!-- 支付解锁 -->
+    <div class="wish-box">
+        <p>💰 支付1元完成仪式：</p>
+        <img src="./img/pay_code.jpg" width="180" style="border:2px solid #4a6da7;">
+        <p>支付后长按保存你的<span style="color:#ffd700">星空愿望卡</span></p>
+    </div>
+
+    <!-- 生成愿望卡（纯前端实现） -->
+    <script>
+        function generateCard() {
+            const wish = document.getElementById('wishText').value;
+            const card = `
+                <div style="background:#1a1f33; padding:20px; border-radius:15px;">
+                    <div class="star">🔮🌠</div>
+                    <h3>${wish}</h3>
+                    <p>—— 来自第${Math.floor(Math.random() * 9999)}号许愿星</p>
+                    <p style="color:#4a6da7">🗓️ 愿望有效期至：2026.12.31</p>
+                    <button onclick="location.reload()">👉 帮朋友点亮一颗星</button>
+                </div>
+            `;
+            document.body.innerHTML = card;
+        }
+        // 监听支付完成（需手动告知用户支付后刷新页面）
+    </script>
+</body>
+
+</html>

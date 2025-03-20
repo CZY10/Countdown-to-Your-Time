@@ -4,7 +4,7 @@ import itchat
 itchat.auto_login(hotReload=True)
 
 # 查找好友，'FriendName' 是你好友的微信昵称
-user = itchat.search_friends(name='金树林天然精油-陈剑')
+user = itchat.search_friends(name='尘')
 
 # 发送消息
 user.send('Hello, this is a message from my Python script!')
