@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV文件上传解析工具</title>
+    <style>
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+
+        .upload-container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .upload-container:hover {
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+
+        .upload-area {
+            border: 2px dashed #bdc3c7;
+            border-radius: 8px;
+            padding: 40px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .upload-area:hover {
+            border-color: #3498db;
+            background-color: #f8fafc;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: #3498db;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .file-info {
+            margin-top: 15px;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f7f0;
+            color: #27ae60;
+            border-radius: 6px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="upload-container">
+        <h1>CSV文件上传解析工具</h1>
+
+        <div id="uploadArea" class="upload-area">
+            <div class="upload-icon">📁</div>
+            <h3>拖放CSV文件到此处</h3>
+            <p>或点击选择文件</p>
+            <input type="file" id="fileInput" accept=".csv">
+            <div class="file-info" id="fileInfo"></div>
+        </div>
+
+        <button id="processBtn" class="btn" disabled>解析CSV数据</button>
+
+        <div class="status" id="status">
+            CSV数据已成功解析！请查看浏览器控制台获取结果。
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+            const fileInfo = document.getElementById('fileInfo');
+            const processBtn = document.getElementById('processBtn');
+            const status = document.getElementById('status');
+
+            // 点击上传区域
+            uploadArea.addEventListener('click', function () {
+                fileInput.click();
+            });
+
+            // 拖放功能
+            uploadArea.addEventListener('dragover', function (e) {
+                e.preventDefault();
+                this.style.borderColor = '#3498db';
+                this.style.backgroundColor = '#f8fafc';
+            });
+
+            uploadArea.addEventListener('dragleave', function () {
+                this.style.borderColor = '#bdc3c7';
+                this.style.backgroundColor = 'white';
+            });
+
+            uploadArea.addEventListener('drop', function (e) {
+                e.preventDefault();
+                this.style.borderColor = '#bdc3c7';
+                this.style.backgroundColor = 'white';
+
+                if (e.dataTransfer.files.length) {
+                    fileInput.files = e.dataTransfer.files;
+                    handleFileSelection(e.dataTransfer.files[0]);
+                }
+            });
+
+            // 文件选择变化
+            fileInput.addEventListener('change', function () {
+                if (this.files.length) {
+                    handleFileSelection(this.files[0]);
+                }
+            });
+
+            // 处理按钮点击
+            processBtn.addEventListener('click', processCSV);
+
+            function handleFileSelection(file) {
+                if (file.type !== 'text/csv' && !file.name.endsWith('.csv')) {
+                    fileInfo.textContent = '请选择CSV文件';
+                    fileInfo.style.color = '#e74c3c';
+                    processBtn.disabled = true;
+                    return;
+                }
+
+                fileInfo.textContent = `已选择: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+                fileInfo.style.color = '#7f8c8d';
+                processBtn.disabled = false;
+            }
+
+            function processCSV() {
+                if (!fileInput.files.length) return;
+
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    const csvData = e.target.result;
+                    const parsedData = parseCSV(csvData);
+
+                    // 输出到控制台
+                    console.log('解析后的CSV数据:', parsedData);
+                    send_request(parsedData)
+
+                    // 显示成功状态
+                    status.style.display = 'block';
+                };
+
+                reader.readAsText(file);
+            }
+
+            function parseCSV(csvText) {
+                // 按行分割，兼容 \r\n 和 \n
+                const lines = csvText.trim().split(/\r?\n/);
+
+                // 获取表头，按逗号分割
+                const headers = lines[0].split(',').map(header => header.trim());
+
+                const result = [];
+
+                for (let i = 1; i < lines.length; i++) {
+                    if (!lines[i].trim()) continue; // 跳过空行
+
+                    // 按逗号分割当前行，注意可能有逗号包裹在引号内，这里简单处理，复杂情况建议用库
+                    const currentLine = splitCSVLine(lines[i]);
+
+                    const obj = {};
+
+                    for (let j = 0; j < headers.length; j++) {
+                        let value = currentLine[j] ? currentLine[j].trim().replace(/^"(.*)"$/, '$1') : '';
+
+                        // original_price_$ 转数字
+                        if (headers[j] === 'original_price_$') {
+                            obj[headers[j]] = value ? Number(value) : null;
+                        } else {
+                            obj[headers[j]] = value;
+                        }
+                    }
+
+                    result.push(obj);
+                }
+
+                return result;
+            }
+
+            // 简单CSV行拆分，支持引号包裹的逗号
+            function splitCSVLine(line) {
+                const result = [];
+                let current = '';
+                let inQuotes = false;
+
+                for (let i = 0; i < line.length; i++) {
+                    const char = line[i];
+
+                    if (char === '"' && (i === 0 || line[i - 1] !== '\\')) {
+                        inQuotes = !inQuotes;
+                        continue;
+                    }
+
+                    if (char === ',' && !inQuotes) {
+                        result.push(current);
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                result.push(current);
+
+                return result;
+            }
+
+            function send_request(updatedArray) {
+                const filteredArray = updatedArray.filter(obj => {
+                    // 定义必须存在的属性列表
+                    const requiredKeys = ['asin', 'discounted_price_$', 'merchant_id', 'original_price_$', 'shipping_info'];
+
+                    // 判断每个属性都存在且不为 undefined 或 null
+                    return requiredKeys.every(key => obj[key] !== 'undefined' && obj[key] !== null);
+                });
+
+                console.log(filteredArray);
+
+                let chunks = splitArrayIntoChunks(filteredArray, 100);
+                const randomSixDigitNumber = generateRandomSixDigitNumber();
+
+                // 测试
+                const url_text = 'https://hksellerblue.myvipon.com/api/product/import';
+                // 生产
+                const url_seller = 'https://seller.myvipon.com/api/product/import';
+                chunks.forEach(item => {
+                    let data = {};
+                    data.online = 0;
+                    data.crawl_flag = randomSixDigitNumber;
+                    data.crawl_type = 1;
+                    data.data = item;
+                    fetch(url_text, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.code == 1) {
+                                console.log('已成功发送给后台');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('请求失败:', error);
+                        });
+                });
+            }
+
+
+            function splitArrayIntoChunks(array, chunkSize) {
+                const result = [];
+                for (let i = 0; i < array.length; i += chunkSize) {
+                    result.push(array.slice(i, i + chunkSize));
+                }
+                return result;
+            }
+
+            //生成6位随机数
+            function generateRandomSixDigitNumber() {
+                const min = 100000; // 6 位数的最小值
+                const max = 999999; // 6 位数的最大值
+                const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+                return randomNumber;
+            }
+        });
+    </script>
+</body>
+
+</html>
