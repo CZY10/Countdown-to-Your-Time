@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>福彩3D游戏模拟器</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #b30000 0%, #800000 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .logo i {
+            font-size: 3rem;
+            color: #ffd700;
+            animation: pulse 2s infinite;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            color: #ffd700;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            margin-top: 10px;
+            opacity: 0.9;
+        }
+
+        .game-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .panel {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .panel-title {
+            font-size: 1.8rem;
+            color: #ffd700;
+            margin-bottom: 20px;
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ffd700;
+        }
+
+        .number-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .number-ball {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #ffffff, #e6e6e6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #d40000;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .number-ball::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 60%);
+            transform: rotate(30deg);
+        }
+
+        .number-ball:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .number-ball.selected {
+            background: linear-gradient(145deg, #ffd700, #ffaa00);
+            color: #b30000;
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
+        }
+
+        .bet-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .bet-amount {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .bet-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ffd700;
+            border: none;
+            color: #b30000;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .bet-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+        }
+
+        #betValue {
+            font-size: 1.8rem;
+            min-width: 80px;
+            text-align: center;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, #ffd700, #ff8c00);
+            color: #800000;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(to right, #4d4d4d, #333333);
+            color: #fff;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .result-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            min-height: 300px;
+        }
+
+        .result-numbers {
+            display: flex;
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .result-ball {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #ffd700, #ff8c00);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.8rem;
+            font-weight: bold;
+            color: #b30000;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-ball::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 60%);
+            transform: rotate(30deg);
+        }
+
+        .win-message {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #ffd700;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            margin-top: 20px;
+            min-height: 60px;
+        }
+
+        .history-panel {
+            margin-top: 30px;
+        }
+
+        .history-list {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .win {
+            color: #7fff00;
+            font-weight: bold;
+        }
+
+        .game-info {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .info-title {
+            font-size: 1.8rem;
+            color: #ffd700;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .rules {
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .rule-item {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .rule-item i {
+            color: #ffd700;
+            margin-right: 10px;
+            margin-top: 5px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes draw {
+            0% {
+                transform: translateY(100px) rotate(0deg);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translateY(0) rotate(360deg);
+                opacity: 1;
+            }
+        }
+
+        .draw-animation .result-ball {
+            animation: draw 0.8s ease-out forwards;
+        }
+
+        .draw-animation .result-ball:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .draw-animation .result-ball:nth-child(2) {
+            animation-delay: 0.4s;
+        }
+
+        .draw-animation .result-ball:nth-child(3) {
+            animation-delay: 0.7s;
+        }
+
+        @media (max-width: 768px) {
+            .game-container {
+                flex-direction: column;
+            }
+
+            .number-ball {
+                width: 60px;
+                height: 60px;
+                font-size: 1.8rem;
+            }
+
+            .result-ball {
+                width: 70px;
+                height: 70px;
+                font-size: 2.2rem;
+            }
+
+            h1 {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-dice"></i>
+                <h1>福彩3D游戏模拟器</h1>
+                <i class="fas fa-dice"></i>
+            </div>
+            <p class="subtitle">选择号码，测试手气，体验福彩3D的乐趣！</p>
+        </header>
+
+        <div class="game-container">
+            <div class="panel">
+                <h2 class="panel-title">选择号码</h2>
+                <div class="number-selector">
+                    <div class="number-ball" data-number="0">0</div>
+                    <div class="number-ball" data-number="1">1</div>
+                    <div class="number-ball" data-number="2">2</div>
+                    <div class="number-ball" data-number="3">3</div>
+                    <div class="number-ball" data-number="4">4</div>
+                </div>
+                <div class="number-selector">
+                    <div class="number-ball" data-number="5">5</div>
+                    <div class="number-ball" data-number="6">6</div>
+                    <div class="number-ball" data-number="7">7</div>
+                    <div class="number-ball" data-number="8">8</div>
+                    <div class="number-ball" data-number="9">9</div>
+                </div>
+
+                <div class="selected-numbers">
+                    <h3>您的选择：<span id="userSelection">---</span></h3>
+                </div>
+
+                <div class="bet-controls">
+                    <h3>投注金额</h3>
+                    <div class="bet-amount">
+                        <button class="bet-btn" id="decreaseBet">-</button>
+                        <span id="betValue">10</span> 元
+                        <button class="bet-btn" id="increaseBet">+</button>
+                    </div>
+
+                    <div class="action-btns">
+                        <button class="btn btn-primary" id="placeBetBtn">投注</button>
+                        <button class="btn btn-secondary" id="clearBtn">清空</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2 class="panel-title">开奖结果</h2>
+                <div class="result-area">
+                    <div class="result-numbers">
+                        <div class="result-ball">?</div>
+                        <div class="result-ball">?</div>
+                        <div class="result-ball">?</div>
+                    </div>
+
+                    <button class="btn btn-primary" id="drawBtn">开始开奖</button>
+
+                    <div class="win-message" id="winMessage">
+                        等待开奖...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel history-panel">
+            <h2 class="panel-title">投注记录</h2>
+            <div class="history-list" id="historyList">
+                <div class="history-item">
+                    <span>时间</span>
+                    <span>投注号码</span>
+                    <span>开奖号码</span>
+                    <span>投注金额</span>
+                    <span>结果</span>
+                </div>
+                <!-- 历史记录将通过JS动态添加 -->
+            </div>
+        </div>
+
+        <div class="game-info">
+            <h2 class="info-title">游戏规则</h2>
+            <div class="rules">
+                <div class="rule-item">
+                    <i class="fas fa-info-circle"></i>
+                    <div>福彩3D是一种三位数彩票游戏，从000到999中选择一个三位数进行投注。</div>
+                </div>
+                <div class="rule-item">
+                    <i class="fas fa-dice"></i>
+                    <div>开奖时随机生成一个三位数作为中奖号码，顺序必须完全一致才能中奖。</div>
+                </div>
+                <div class="rule-item">
+                    <i class="fas fa-trophy"></i>
+                    <div>中奖奖金为投注金额的1000倍（模拟）。</div>
+                </div>
+                <div class="rule-item">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>本游戏为模拟体验，不涉及真实货币交易。彩票有风险，投注需谨慎。</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2023 福彩3D模拟游戏 | 本游戏仅用于娱乐目的</p>
+            <p>理性购彩，健康生活</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // 游戏状态
+            const state = {
+                selectedNumbers: [],
+                betAmount: 10,
+                history: []
+            };
+
+            // DOM元素
+            const numberBalls = document.querySelectorAll('.number-ball');
+            const userSelection = document.getElementById('userSelection');
+            const betValue = document.getElementById('betValue');
+            const decreaseBet = document.getElementById('decreaseBet');
+            const increaseBet = document.getElementById('increaseBet');
+            const placeBetBtn = document.getElementById('placeBetBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const drawBtn = document.getElementById('drawBtn');
+            const resultBalls = document.querySelectorAll('.result-ball');
+            const winMessage = document.getElementById('winMessage');
+            const historyList = document.getElementById('historyList');
+
+            // 初始化
+            function init() {
+                updateUI();
+
+                // 事件监听
+                numberBalls.forEach(ball => {
+                    ball.addEventListener('click', selectNumber);
+                });
+
+                decreaseBet.addEventListener('click', () => adjustBet(-2));
+                increaseBet.addEventListener('click', () => adjustBet(2));
+                placeBetBtn.addEventListener('click', placeBet);
+                clearBtn.addEventListener('click', clearSelection);
+                drawBtn.addEventListener('click', drawNumbers);
+            }
+
+            // 选择号码
+            function selectNumber(e) {
+                const number = e.target.getAttribute('data-number');
+
+                if (state.selectedNumbers.length < 3) {
+                    state.selectedNumbers.push(number);
+                    updateUI();
+                }
+            }
+
+            // 调整投注金额
+            function adjustBet(amount) {
+                state.betAmount += amount;
+                if (state.betAmount < 2) state.betAmount = 2;
+                if (state.betAmount > 100) state.betAmount = 100;
+                betValue.textContent = state.betAmount;
+            }
+
+            // 更新UI
+            function updateUI() {
+                // 更新选号显示
+                userSelection.textContent = state.selectedNumbers.length > 0 ?
+                    state.selectedNumbers.join('') : '---';
+
+                // 更新号码球状态
+                numberBalls.forEach(ball => {
+                    const num = ball.getAttribute('data-number');
+                    if (state.selectedNumbers.includes(num)) {
+                        ball.classList.add('selected');
+                    } else {
+                        ball.classList.remove('selected');
+                    }
+                });
+
+                // 更新按钮状态
+                placeBetBtn.disabled = state.selectedNumbers.length !== 3;
+                drawBtn.disabled = state.history.length === 0 ||
+                    state.history[state.history.length - 1].result !== undefined;
+            }
+
+            // 清空选择
+            function clearSelection() {
+                state.selectedNumbers = [];
+                updateUI();
+            }
+
+            // 投注
+            function placeBet() {
+                if (state.selectedNumbers.length !== 3) return;
+
+                // 添加到历史记录
+                state.history.push({
+                    time: new Date().toLocaleTimeString(),
+                    userNumbers: [...state.selectedNumbers],
+                    drawNumbers: null,
+                    betAmount: state.betAmount,
+                    result: null
+                });
+
+                // 清空选择
+                state.selectedNumbers = [];
+                updateUI();
+                updateHistory();
+
+                // 提示
+                winMessage.textContent = "投注成功！请点击开奖按钮";
+                winMessage.style.color = "#ffd700";
+            }
+
+            // 开奖
+            function drawNumbers() {
+                if (state.history.length === 0) return;
+
+                const lastBet = state.history[state.history.length - 1];
+                if (lastBet.result !== null) return;
+
+                // 生成随机号码
+                const drawNumbers = [];
+                for (let i = 0; i < 3; i++) {
+                    drawNumbers.push(Math.floor(Math.random() * 10).toString());
+                }
+
+                // 更新开奖结果
+                lastBet.drawNumbers = drawNumbers;
+
+                // 判断是否中奖
+                const userNumStr = lastBet.userNumbers.join('');
+                const drawNumStr = drawNumbers.join('');
+                const win = userNumStr === drawNumStr;
+
+                lastBet.result = win ? '中奖' : '未中奖';
+
+                // 显示开奖动画
+                showDrawAnimation(drawNumbers, win);
+                updateHistory();
+            }
+
+            // 显示开奖动画
+            function showDrawAnimation(numbers, win) {
+                // 添加动画类
+                const resultArea = document.querySelector('.result-numbers');
+                resultArea.classList.add('draw-animation');
+
+                // 更新号码显示
+                setTimeout(() => {
+                    resultBalls.forEach((ball, index) => {
+                        setTimeout(() => {
+                            ball.textContent = numbers[index];
+                        }, 300 * (index + 1));
+                    });
+                }, 100);
+
+                // 显示结果消息
+                setTimeout(() => {
+                    if (win) {
+                        winMessage.textContent = `恭喜您中奖了！获得 ${state.betAmount * 1000} 元`;
+                        winMessage.style.color = "#7fff00";
+                    } else {
+                        winMessage.textContent = "很遗憾，这次没有中奖";
+                        winMessage.style.color = "#ffd700";
+                    }
+
+                    // 移除动画类以便下次使用
+                    setTimeout(() => {
+                        resultArea.classList.remove('draw-animation');
+                    }, 1000);
+                }, 2000);
+
+                updateUI();
+            }
+
+            // 更新历史记录
+            function updateHistory() {
+                // 清空历史记录（保留表头）
+                while (historyList.children.length > 1) {
+                    historyList.removeChild(historyList.lastChild);
+                }
+
+                // 添加历史记录（倒序显示）
+                for (let i = state.history.length - 1; i >= 0; i--) {
+                    const record = state.history[i];
+                    const item = document.createElement('div');
+                    item.className = 'history-item';
+
+                    let drawNumbers = '---';
+                    let resultDisplay = '等待开奖';
+
+                    if (record.drawNumbers) {
+                        drawNumbers = record.drawNumbers.join('');
+                        resultDisplay = record.result;
+                        if (resultDisplay === '中奖') {
+                            item.classList.add('win');
+                        }
+                    }
+
+                    item.innerHTML = `
+                        <span>${record.time}</span>
+                        <span>${record.userNumbers.join('')}</span>
+                        <span>${drawNumbers}</span>
+                        <span>${record.betAmount}元</span>
+                        <span>${resultDisplay}</span>
+                    `;
+
+                    historyList.appendChild(item);
+                }
+            }
+
+            // 初始化游戏
+            init();
+        });
+    </script>
+</body>
+
+</html>
