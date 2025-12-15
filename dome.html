@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <button onclick="openApp(1272023223)">打开</button>
+
+</body>
+
+<script>
+    function openApp(productId) {
+        // 1. 自定义 Scheme·
+        var scheme = "vipon://product/" + productId;
+
+        // 2. iOS App Store 地址
+        var iosDownload = "https://apps.apple.com/us/app/vipon-deals-coupons/id1272023223";
+
+        // 3. Android Google Play 地址
+        var androidDownload = "https://play.google.com/store/apps/details?id=com.vipon";
+
+        // 4. 跳转逻辑
+        var start = Date.now();
+        window.location.href = scheme;
+
+        setTimeout(function () {
+            if (Date.now() - start < 2000) {
+                // 唤起失败，跳转下载
+                if (/iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase())) {
+                    window.location.href = iosDownload;
+                } else {
+                    window.location.href = androidDownload;
+                }
+            }
+        }, 1500);
+    }
+</script>
+
+</html>
