@@ -28,16 +28,16 @@
         var start = Date.now();
         window.location.href = scheme;
 
-        // setTimeout(function () {
-        //     if (Date.now() - start < 2000) {
-        //         // 唤起失败，跳转下载
-        //         if (/iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase())) {
-        //             window.location.href = iosDownload;
-        //         } else {
-        //             window.location.href = androidDownload;
-        //         }
-        //     }
-        // }, 1500);
+        setTimeout(function () {
+            if (Date.now() - start < 3000) {
+                // 唤起失败，跳转下载
+                if (/iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase())) {
+                    window.location.href = iosDownload;
+                } else {
+                    window.location.href = androidDownload;
+                }
+            }
+        }, 1500);
     }
 </script>
 
