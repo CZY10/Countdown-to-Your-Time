@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>💍 婚礼倒计时 · 手机专属</title>
+    <!-- 优雅字体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            height: 100vh;
+            /* 固定视口高度，无滚动条 */
+            width: 100vw;
+            overflow: hidden;
+            /* 隐藏溢出 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(145deg, #2c1f3a 0%, #4f3b5f 40%, #8b6f88 100%);
+            position: relative;
+            padding: 12px;
+            /* 安全边距 */
+        }
+
+        /* 梦幻光斑背景 (保持不变) */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 70vmax;
+            height: 70vmax;
+            top: -15vmax;
+            right: -10vmax;
+            background: radial-gradient(circle at 30% 50%, rgba(255, 215, 200, 0.4) 0%, rgba(255, 190, 160, 0.1) 50%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(80px);
+            animation: slowDrift 22s infinite alternate ease-in-out;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: absolute;
+            width: 80vmin;
+            height: 80vmin;
+            bottom: -10vmin;
+            left: -10vmin;
+            background: radial-gradient(circle at 70% 70%, rgba(230, 210, 255, 0.5) 0%, rgba(200, 170, 220, 0.2) 40%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(90px);
+            animation: slowDrift 28s alternate-reverse infinite;
+            z-index: 0;
+        }
+
+        @keyframes slowDrift {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0.7;
+            }
+
+            100% {
+                transform: translate(4%, 6%) scale(1.2);
+                opacity: 1;
+            }
+        }
+
+        /* 主卡片 — 高度自适应，不超过视口 */
+        .wedding-box {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 560px;
+            /* 稍宽一点，但不超过屏幕 */
+            max-height: 90vh;
+            /* 限制最大高度，防止溢出 */
+            margin: 0 auto;
+            padding: 32px 24px;
+            text-align: center;
+            border-radius: 64px 24px 64px 24px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(18px) saturate(180%);
+            -webkit-backdrop-filter: blur(18px) saturate(180%);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 245, 240, 0.3) inset, 0 0 30px rgba(255, 230, 210, 0.6);
+            border: 1px solid rgba(255, 245, 235, 0.25);
+            transition: box-shadow 0.4s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            /* 垂直居中内容 */
+        }
+
+        /* 标题区 */
+        .wedding-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            font-weight: 400;
+            letter-spacing: 4px;
+            color: #fffaf2;
+            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 220, 190, 0.7);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            word-spacing: 6px;
+        }
+
+        .wedding-sub {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 16px;
+            font-weight: 300;
+            letter-spacing: 3px;
+            color: #fbe9dd;
+            margin-bottom: 24px;
+            border-bottom: 1px dashed rgba(255, 235, 215, 0.6);
+            display: inline-block;
+            padding-bottom: 8px;
+            padding-left: 16px;
+            padding-right: 16px;
+            backdrop-filter: blur(4px);
+            border-radius: 40px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            align-self: center;
+        }
+
+        .wedding-sub i {
+            font-style: normal;
+            margin: 0 6px;
+            color: #ffdbb5;
+        }
+
+        /* 倒计时容器 */
+        .wedding-countdown {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin: 8px 0 10px;
+        }
+
+        /* 时间卡片 */
+        .time-item {
+            flex: 0 0 auto;
+            width: 100px;
+            padding: 20px 8px 14px;
+            border-radius: 36px 16px 36px 16px;
+            background: rgba(30, 20, 35, 0.2);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 240, 230, 0.4);
+            box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 230, 210, 0.3) inset, 0 0 25px rgba(255, 200, 170, 0.4);
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            animation: cardFloat 5s infinite alternate ease-in-out;
+            position: relative;
+            -webkit-tap-highlight-color: transparent;
+            /* 去掉移动端默认灰块 */
+        }
+
+        /* 触摸反馈类 (由JS控制) */
+        .time-item.touch-active {
+            transform: scale(1.05) translateY(-6px);
+            background: rgba(60, 40, 50, 0.4);
+            border-color: rgba(255, 235, 200, 0.9);
+            box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.6), 0 0 0 2px rgba(255, 245, 220, 0.7) inset, 0 0 50px #ffc8ad;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        /* 每个卡片延迟 */
+        .time-item:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .time-item:nth-child(2) {
+            animation-delay: 0.6s;
+        }
+
+        .time-item:nth-child(3) {
+            animation-delay: 1.2s;
+        }
+
+        .time-item:nth-child(4) {
+            animation-delay: 1.8s;
+        }
+
+        @keyframes cardFloat {
+            0% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            100% {
+                transform: translateY(-8px) rotate(0.5deg);
+            }
+        }
+
+        /* 顶部小装饰 */
+        .time-item::before {
+            content: "✧";
+            position: absolute;
+            top: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 22px;
+            color: rgba(255, 250, 220, 0.9);
+            text-shadow: 0 0 12px #ffb28b;
+            opacity: 0.9;
+            transition: 0.2s;
+        }
+
+        .time-item.touch-active::before {
+            content: "❤️";
+            font-size: 18px;
+            filter: drop-shadow(0 0 8px #ffaa88);
+        }
+
+        /* 数字 */
+        .time-item span {
+            display: block;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 46px;
+            line-height: 1;
+            background: linear-gradient(135deg, #fef8f0, #ffe7d4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 20px #ffb693, 2px 4px 12px rgba(0, 0, 0, 0.3);
+            letter-spacing: 4px;
+            margin-bottom: 6px;
+            animation: gentlePulse 3s infinite ease-in-out;
+        }
+
+        @keyframes gentlePulse {
+            0% {
+                text-shadow: 0 0 15px #ffc5a3, 2px 4px 12px rgba(0, 0, 0, 0.3);
+                opacity: 0.95;
+            }
+
+            50% {
+                text-shadow: 0 0 30px #ffe5c0, 2px 4px 16px rgba(0, 0, 0, 0.4);
+                opacity: 1;
+                transform: scale(1.02);
+            }
+
+            100% {
+                text-shadow: 0 0 15px #ffc5a3, 2px 4px 12px rgba(0, 0, 0, 0.3);
+                opacity: 0.95;
+            }
+        }
+
+        /* 标签 */
+        .time-item label {
+            display: block;
+            font-size: 13px;
+            font-weight: 400;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #ffefdd;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 4px 0 2px;
+            border-radius: 40px;
+            width: 80%;
+            margin: 0 auto;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 245, 220, 0.25);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: 0.2s;
+        }
+
+        .time-item.touch-active label {
+            background: rgba(70, 45, 55, 0.4);
+            border-color: #ffdbb5;
+            color: #fff5e6;
+            letter-spacing: 3px;
+        }
+
+        /* 底部浪漫小语 */
+        .wedding-note {
+            margin-top: 20px;
+            font-size: 13px;
+            font-weight: 300;
+            color: #ffefe2;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border-top: 1px dashed rgba(255, 230, 200, 0.6);
+            padding-top: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            backdrop-filter: blur(4px);
+        }
+
+        .wedding-note span {
+            font-family: 'Playfair Display', serif;
+            font-size: 17px;
+            font-style: italic;
+            font-weight: 400;
+            color: #ffdbbf;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* 可点击的日期增加提示 */
+        .wedding-note span:first-child {
+            cursor: pointer;
+            position: relative;
+        }
+
+        .wedding-note span:first-child:active {
+            opacity: 0.8;
+            transform: scale(0.98);
+        }
+
+        .wedding-note i {
+            font-style: normal;
+            font-size: 20px;
+            filter: drop-shadow(0 0 8px #ff9f7b);
+        }
+
+        /* 自定义轻提示 (Toast) */
+        .toast-message {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) scale(0.9);
+            background: rgba(20, 10, 15, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: #ffebe0;
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            border: 1px solid rgba(255, 220, 190, 0.5);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            z-index: 200;
+            opacity: 0;
+            transition: opacity 0.25s, transform 0.25s;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .toast-message.show {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+
+        /* 爱心飘浮特效容器 */
+        .heart-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            overflow: hidden;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 22px;
+            color: #ffb0a0;
+            opacity: 0.9;
+            animation: floatHeart 1.8s ease-out forwards;
+            filter: drop-shadow(0 0 10px #ff6f61);
+            user-select: none;
+        }
+
+        @keyframes floatHeart {
+            0% {
+                transform: translate(0, 0) scale(0.8);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(var(--tx), -120px) scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        /* ========= 移动端超精细适配 ========= */
+        @media (max-width: 480px) {
+            .wedding-box {
+                padding: 20px 16px;
+                border-radius: 48px 16px 48px 16px;
+            }
+
+            .wedding-title {
+                font-size: 22px;
+                letter-spacing: 3px;
+                margin-bottom: 6px;
+            }
+
+            .wedding-sub {
+                font-size: 14px;
+                margin-bottom: 16px;
+                padding-bottom: 6px;
+            }
+
+            .wedding-countdown {
+                gap: 10px;
+            }
+
+            .time-item {
+                width: 78px;
+                padding: 16px 4px 10px;
+            }
+
+            .time-item span {
+                font-size: 34px;
+                letter-spacing: 2px;
+            }
+
+            .time-item label {
+                font-size: 10px;
+                letter-spacing: 1.5px;
+                width: 85%;
+            }
+
+            .time-item::before {
+                font-size: 16px;
+                top: -4px;
+            }
+
+            .wedding-note {
+                margin-top: 12px;
+                padding-top: 12px;
+                font-size: 11px;
+                gap: 10px;
+            }
+
+            .wedding-note span {
+                font-size: 15px;
+            }
+        }
+
+        @media (max-width: 375px) {
+            .time-item {
+                width: 70px;
+                padding: 14px 4px 8px;
+            }
+
+            .time-item span {
+                font-size: 30px;
+            }
+
+            .time-item label {
+                font-size: 9px;
+                width: 90%;
+            }
+
+            .wedding-title {
+                font-size: 20px;
+            }
+
+            .wedding-sub {
+                font-size: 12px;
+            }
+        }
+
+        /* 横屏提醒 (可选) */
+        @media (orientation: landscape) and (max-height: 500px) {
+            .wedding-box {
+                max-height: 95vh;
+                padding: 12px 20px;
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: center;
+            }
+
+            .wedding-countdown {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 浮层提示 Toast -->
+    <div class="toast-message" id="copyToast">📅 婚礼日期已复制</div>
+    <!-- 爱心飘落容器 -->
+    <div class="heart-container" id="heartContainer"></div>
+
+    <div class="wedding-box">
+        <div class="wedding-title">💫 我们的婚礼 💫</div>
+        <div class="wedding-sub"><i>👰</i> 🐂 & 陈 <i>🤵</i></div>
+
+        <div class="wedding-countdown">
+            <div class="time-item" id="cardDay">
+                <span id="d">00</span>
+                <label>天</label>
+            </div>
+            <div class="time-item" id="cardHour">
+                <span id="h">00</span>
+                <label>时</label>
+            </div>
+            <div class="time-item" id="cardMin">
+                <span id="m">00</span>
+                <label>分</label>
+            </div>
+            <div class="time-item" id="cardSec">
+                <span id="s">00</span>
+                <label>秒</label>
+            </div>
+        </div>
+
+        <!-- 底部日期可点击复制 -->
+        <div class="wedding-note">
+            <span id="weddingDate">❤️ 2026.09.28 ❤️</span>
+            <i>•</i>
+            <span>直到永远</span>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            const targetTime = new Date('2026-09-28T00:00:00');
+
+            // ---------- 倒计时更新 ----------
+            function updateCountdown() {
+                const now = new Date();
+                const diff = targetTime - now;
+
+                if (diff <= 0) {
+                    document.querySelector(".wedding-title").innerHTML = "🎉 今天是我们的大喜之日 🎉";
+                    document.querySelector(".wedding-sub").innerHTML = "💞  Forever  &  Always  💞";
+                    document.querySelector(".wedding-note span:first-child").innerText = "❤️ Just Married ❤️";
+                    clearInterval(timer);
+                    document.getElementById('d').innerText = "00";
+                    document.getElementById('h').innerText = "00";
+                    document.getElementById('m').innerText = "00";
+                    document.getElementById('s').innerText = "00";
+                    return;
+                }
+
+                const totalSeconds = Math.floor(diff / 1000);
+                const days = Math.floor(totalSeconds / (24 * 60 * 60));
+                const hours = Math.floor((totalSeconds % (24 * 60 * 60)) / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = totalSeconds % 60;
+
+                document.getElementById('d').innerText = String(days).padStart(2, '0');
+                document.getElementById('h').innerText = String(hours).padStart(2, '0');
+                document.getElementById('m').innerText = String(minutes).padStart(2, '0');
+                document.getElementById('s').innerText = String(seconds).padStart(2, '0');
+            }
+            updateCountdown();
+            const timer = setInterval(updateCountdown, 1000);
+
+            // ---------- 移动端触摸反馈 (卡片按压效果) ----------
+            const cards = document.querySelectorAll('.time-item');
+            cards.forEach(card => {
+                // 触摸开始
+                card.addEventListener('touchstart', (e) => {
+                    card.classList.add('touch-active');
+                }, { passive: true });
+                // 触摸结束（包括离开和取消）
+                card.addEventListener('touchend', () => {
+                    card.classList.remove('touch-active');
+                });
+                card.addEventListener('touchcancel', () => {
+                    card.classList.remove('touch-active');
+                });
+                // 兼容鼠标（可选，方便调试）
+                card.addEventListener('mousedown', () => card.classList.add('touch-active'));
+                card.addEventListener('mouseup', () => card.classList.remove('touch-active'));
+                card.addEventListener('mouseleave', () => card.classList.remove('touch-active'));
+            });
+
+            // ---------- 点击复制婚礼日期 (带Toast) ----------
+            const dateSpan = document.getElementById('weddingDate');
+            const toast = document.getElementById('copyToast');
+            let toastTimer = null;
+
+            function showToast(msg) {
+                if (toastTimer) clearTimeout(toastTimer);
+                toast.textContent = msg || '📅 婚礼日期已复制';
+                toast.classList.add('show');
+                toastTimer = setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 1800);
+            }
+
+            if (dateSpan) {
+                dateSpan.addEventListener('click', (e) => {
+                    e.stopPropagation();  // 防止触发背景爱心
+                    const dateText = '2026.09.28';  // 提取纯数字
+                    // 复制到剪贴板
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(dateText).then(() => {
+                            showToast('📅 日期已复制');
+                        }).catch(() => {
+                            // 降级方案
+                            const textarea = document.createElement('textarea');
+                            textarea.value = dateText;
+                            document.body.appendChild(textarea);
+                            textarea.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(textarea);
+                            showToast('📅 日期已复制');
+                        });
+                    } else {
+                        // 旧版降级
+                        const textarea = document.createElement('textarea');
+                        textarea.value = dateText;
+                        document.body.appendChild(textarea);
+                        textarea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textarea);
+                        showToast('📅 日期已复制');
+                    }
+                });
+            }
+
+            // ---------- 点击背景出现爱心 (浪漫特效) ----------
+            const heartContainer = document.getElementById('heartContainer');
+
+            function createHeart(x, y) {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                // 随机爱心符号
+                const symbols = ['❤️', '🧡', '💖', '💘', '💝', '❤️‍🔥', '🌸'];
+                heart.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+                // 随机水平偏移量
+                const tx = (Math.random() - 0.5) * 80; // -40px ~ 40px
+                heart.style.setProperty('--tx', tx + 'px');
+                heart.style.left = x + 'px';
+                heart.style.top = y + 'px';
+                heart.style.fontSize = (18 + Math.floor(Math.random() * 20)) + 'px';
+                heartContainer.appendChild(heart);
+
+                // 动画结束后移除
+                setTimeout(() => {
+                    heart.remove();
+                }, 1800);
+            }
+
+            // 监听整个页面的点击（但排除卡片和日期，避免冲突）
+            document.body.addEventListener('click', (e) => {
+                // 如果点击的元素或其父级是 .time-item 或 #weddingDate，则不触发爱心
+                if (e.target.closest('.time-item') || e.target.closest('#weddingDate')) {
+                    return;
+                }
+                createHeart(e.clientX, e.clientY);
+            });
+
+            // 为了更好的触摸体验，也监听 touchstart 但不阻止默认（仅用于位置记录）
+            document.body.addEventListener('touchstart', (e) => {
+                // 如果触摸点在卡片或日期上，忽略
+                if (e.target.closest('.time-item') || e.target.closest('#weddingDate')) {
+                    return;
+                }
+                const touch = e.touches[0];
+                if (touch) {
+                    // 用 touchend 触发爱心，避免干扰滚动
+                    const handler = (ev) => {
+                        if (!ev.target.closest('.time-item') && !ev.target.closest('#weddingDate')) {
+                            createHeart(touch.clientX, touch.clientY);
+                        }
+                        document.removeEventListener('touchend', handler);
+                    };
+                    document.addEventListener('touchend', handler, { once: true });
+                }
+            }, { passive: true });
+
+            // 页面加载完成时，显示一个小小的欢迎提示（可选）
+            console.log('❤️ 婚礼倒计时 手机版已加载');
+        })();
+    </script>
+</body>
+
+</html>
