@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <title>iPhone 自动估价系统</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f5f5f5;
+            padding: 40px;
+        }
+
+        .box {
+            max-width: 460px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, .06);
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        label {
+            display: block;
+            margin: 14px 0 6px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        select,
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        button {
+            margin-top: 20px;
+            width: 100%;
+            padding: 12px;
+            background: #000;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 22px;
+            font-weight: 600;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="box">
+        <h2>iPhone 自动估价系统</h2>
+
+        <label>机型</label>
+        <select id="model">
+            <option value="iPhone 8 Plus">iPhone 8 Plus</option>
+            <option value="iPhone 11">iPhone 11</option>
+        </select>
+
+        <label>容量</label>
+        <select id="capacity"></select>
+
+        <label>成色</label>
+        <select id="condition">
+            <option value="A">A 级（几乎无划痕）</option>
+            <option value="B">B 级（轻微划痕）</option>
+            <option value="C">C 级（明显磕碰）</option>
+        </select>
+
+        <label>电池健康（%）</label>
+        <input id="battery" type="number" value="85">
+
+        <label>屏幕</label>
+        <select id="screen">
+            <option value="original">原装屏</option>
+            <option value="non-original">副厂屏</option>
+        </select>
+
+        <label>主板是否维修</label>
+        <select id="board">
+            <option value="false">否</option>
+            <option value="true">是</option>
+        </select>
+
+        <label>配件</label>
+        <select id="accessories" multiple>
+            <option value="box">原装盒子</option>
+            <option value="charger">原装充电器</option>
+        </select>
+
+        <button onclick="calc()">计算价格</button>
+
+        <div class="result" id="result">—</div>
+    </div>
+
+    <script>
+        // 机型规则库（可无限扩展）
+        const modelRules = {
+            "iPhone 8 Plus": {
+                base: { 64: 400, 256: 500 },
+                condition: { A: 50, B: 0, C: -120 },
+                battery: [
+                    { min: 90, adj: 0 },
+                    { min: 85, adj: -30 },
+                    { min: 80, adj: -60 },
+                    { min: 0, adj: -100 }
+                ],
+                screen: { original: 0, "non-original": -200 },
+                board: { repaired: -400, ok: 0 },
+                accessories: { box: 20, charger: 20 }
+            },
+
+            "iPhone 11": {
+                base: { 64: 900, 128: 1000, 256: 1150 },
+                condition: { A: 80, B: 0, C: -150 },
+                battery: [
+                    { min: 90, adj: 0 },
+                    { min: 85, adj: -40 },
+                    { min: 80, adj: -80 },
+                    { min: 0, adj: -120 }
+                ],
+                screen: { original: 0, "non-original": -300 },
+                board: { repaired: -500, ok: 0 },
+                accessories: { box: 30, charger: 30 }
+            }
+        };
+
+        // 根据机型自动加载容量选项
+        function loadCapacity() {
+            const model = document.getElementById('model').value;
+            const capSel = document.getElementById('capacity');
+            capSel.innerHTML = "";
+            const caps = Object.keys(modelRules[model].base);
+            caps.forEach(c => {
+                const opt = document.createElement("option");
+                opt.value = c;
+                opt.textContent = c + "GB";
+                capSel.appendChild(opt);
+            });
+        }
+        loadCapacity();
+        document.getElementById('model').addEventListener('change', loadCapacity);
+
+        // 通用估价引擎
+        function estimatePrice(model, { capacity, condition, battery, screen, board, accessories }) {
+            const rule = modelRules[model];
+            let price = rule.base[capacity] || 0;
+
+            price += rule.condition[condition] || 0;
+
+            for (const b of rule.battery) {
+                if (battery >= b.min) {
+                    price += b.adj;
+                    break;
+                }
+            }
+
+            price += rule.screen[screen] || 0;
+            price += rule.board[board ? "repaired" : "ok"] || 0;
+
+            accessories.forEach(a => {
+                price += rule.accessories[a] || 0;
+            });
+
+            return price;
+        }
+
+        // 计算按钮
+        function calc() {
+            const model = document.getElementById('model').value;
+            const capacity = Number(document.getElementById('capacity').value);
+            const condition = document.getElementById('condition').value;
+            const battery = Number(document.getElementById('battery').value);
+            const screen = document.getElementById('screen').value;
+            const board = document.getElementById('board').value === 'true';
+            const accessories = Array.from(document.getElementById('accessories').selectedOptions).map(o => o.value);
+
+            const price = estimatePrice(model, { capacity, condition, battery, screen, board, accessories });
+            document.getElementById('result').innerText = price + " RMB";
+        }
+    </script>
+
+</body>
+
+</html>
