@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>🎁 恭喜您获得幸运大奖</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+            background: radial-gradient(circle at 50% 18%, #fff4d6 0%, #ffb199 55%, #ff7a6b 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        @keyframes shakeIt {
+
+            0%,
+            100% {
+                transform: translate(0, 0);
+            }
+
+            20% {
+                transform: translate(4px, -4px);
+            }
+
+            40% {
+                transform: translate(-4px, 4px);
+            }
+
+            60% {
+                transform: translate(4px, 4px);
+            }
+
+            80% {
+                transform: translate(-4px, -4px);
+            }
+        }
+
+        body.shaking {
+            animation: shakeIt .12s linear 14;
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: .35;
+            }
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(.55);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
+        }
+
+        /* ---------- 初始卡片 / 结局卡片 ---------- */
+        .prize-card {
+            width: min(430px, 92vw);
+            background: #fff;
+            border-radius: 20px;
+            padding: 40px 30px 24px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 30px 70px -14px rgba(170, 50, 30, .55), 0 0 0 6px rgba(255, 255, 255, .35);
+        }
+
+        .prize-badge {
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(90deg, #ff3d00, #ff9100);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            padding: 5px 18px;
+            border-radius: 999px;
+            white-space: nowrap;
+            box-shadow: 0 6px 16px rgba(255, 61, 0, .45);
+            animation: blink 1s infinite;
+        }
+
+        .prize-emoji {
+            font-size: 54px;
+            line-height: 1;
+            margin-bottom: 14px;
+        }
+
+        .prize-title {
+            font-size: 22px;
+            color: #1e293b;
+            margin-bottom: 12px;
+        }
+
+        .prize-desc {
+            font-size: 14px;
+            color: #64748b;
+            line-height: 1.7;
+            margin-bottom: 24px;
+        }
+
+        .prize-desc b {
+            color: #ff3d00;
+            font-size: 18px;
+        }
+
+        .prize-btn {
+            width: 100%;
+            padding: 14px;
+            font-size: 17px;
+            font-weight: 800;
+            color: #fff;
+            background: linear-gradient(90deg, #ff6b35, #ff3d00);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 10px 24px -6px rgba(255, 61, 0, .6);
+            transition: transform .12s ease;
+        }
+
+        .prize-btn:active {
+            transform: scale(.97);
+        }
+
+        .prize-tiny {
+            margin-top: 14px;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        /* ---------- 弹窗 ---------- */
+        .popup {
+            position: fixed;
+            width: 260px;
+            background: #fff;
+            border: 2px solid #ff5252;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, .35);
+            animation: popIn .18s ease-out;
+        }
+
+        .popup-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            background: linear-gradient(90deg, #ff5252, #ff8a65);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 8px 10px;
+        }
+
+        .popup-close {
+            width: 20px;
+            height: 20px;
+            line-height: 18px;
+            text-align: center;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, .18);
+            cursor: pointer;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .popup-close:hover {
+            background: rgba(0, 0, 0, .38);
+        }
+
+        .popup-body {
+            padding: 16px 14px;
+            font-size: 13px;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .popup-footer {
+            padding: 0 14px 14px;
+            text-align: right;
+        }
+
+        .popup-btn {
+            border: none;
+            cursor: pointer;
+            background: linear-gradient(90deg, #ff6b35, #ff3d00);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 7px 16px;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(255, 61, 0, .4);
+        }
+
+        .popup-btn:active {
+            transform: scale(.96);
+        }
+
+        /* ---------- 认输按钮 ---------- */
+        .surrender-btn {
+            position: fixed;
+            left: 50%;
+            bottom: 28px;
+            transform: translateX(-50%);
+            z-index: 99999;
+            padding: 11px 34px;
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+            background: linear-gradient(135deg, #334155, #0f172a);
+            border: none;
+            border-radius: 999px;
+            cursor: pointer;
+            box-shadow: 0 10px 24px -6px rgba(0, 0, 0, .5);
+            white-space: nowrap;
+            transition: left .2s ease;
+        }
+
+        /* ---------- Toast ---------- */
+        .toast {
+            position: fixed;
+            left: 50%;
+            top: 18%;
+            transform: translateX(-50%);
+            z-index: 999999;
+            background: rgba(0, 0, 0, .82);
+            color: #fff;
+            font-size: 13px;
+            white-space: nowrap;
+            padding: 8px 16px;
+            border-radius: 20px;
+            pointer-events: none;
+            animation: toastIn .2s ease-out;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 初始卡片 -->
+    <div class="prize-card" id="prizeCard">
+        <span class="prize-badge">限 时 抢</span>
+        <div class="prize-emoji">🎁</div>
+        <h1 class="prize-title">恭喜您被系统选中</h1>
+        <p class="prize-desc">点击下方按钮，领取 <b>¥100</b> 无门槛现金红包</p>
+        <button class="prize-btn" id="startBtn">🎉 立即领取</button>
+        <p class="prize-tiny">已有 2,391,204 人领取成功</p>
+    </div>
+
+    <!-- 结局卡片 -->
+    <div class="prize-card" id="endingCard" style="display:none;">
+        <div class="prize-emoji">🤡</div>
+        <h1 class="prize-title">哈哈，被骗了吧</h1>
+        <p class="prize-desc">
+            这只是一个纯前端的恶作剧页面，<br>
+            没有红包、没有中奖、也没有收集你的任何数据。
+        </p>
+        <button class="prize-btn" id="restartBtn">再玩一次</button>
+    </div>
+
+    <!-- 认输按钮（初始隐藏） -->
+    <button class="surrender-btn" id="surrenderBtn" style="display:none;">我认输</button>
+
+    <script>
+        (function () {
+            'use strict';
+
+            var MAX_POPUPS = 22;                 // 弹窗数量上限，防止真把浏览器卡死
+            var popups = [];
+            var surrenderClicks = 0;
+            var SUR_TEXTS = ['我认输', '真的认输', '我保证不乱点了', '好吧我错了', '放我走吧'];
+
+            var templates = [
+                { title: '🎉 恭喜中奖', text: '您是第 1000000 位幸运访客，100 元红包待领取！', btn: '立即领取' },
+                { title: '⏰ 倒计时', text: '您的专属优惠券将在 00:03 后失效，请尽快使用！', btn: '马上去用' },
+                { title: '⚠️ 系统提示', text: '检测到您的电脑速度击败了全国 1% 的用户，建议立即优化。', btn: '立即优化' },
+                { title: '💌 新消息', text: '您有 3 条未读的粉丝来信，点击查看。', btn: '查看消息' },
+                { title: '🔥 限时秒杀', text: 'iPhone 16 Pro 仅需 ¥9.9，还差 1 人成团！', btn: '立即参团' },
+                { title: '🎁 神秘礼盒', text: '您有一个神秘礼盒未开启，内含 iPhone 概率 0.0001%。', btn: '开启礼盒' },
+                { title: '📢 通知', text: '您的好友邀请您助力砍一刀，还差 0.1 元就能提现。', btn: '帮他砍一刀' },
+                { title: '💎 尊贵会员', text: '您已连续登录 365 天，获得钻石会员体验卡 ×1。', btn: '立即激活' }
+            ];
+
+            var closeTaunts = [
+                '关闭失败：该弹窗已升级为超级弹窗',
+                '再想想？关闭后将失去抽奖资格',
+                '手速不错，可惜没用',
+                '这个按钮只是装饰',
+                '您已关闭 0 个弹窗，还剩 99+ 个'
+            ];
+
+            var btnTaunts = [
+                '领取失败：请先关闭其他弹窗',
+                '网络开小差了，请重试',
+                '您的手速击败了 99% 的用户，但奖品已领完',
+                '恭喜获得「再来一次」×1',
+                '系统正在为您排队，前面还有 99999 人'
+            ];
+
+            var card = document.getElementById('prizeCard');
+            var endingCard = document.getElementById('endingCard');
+            var startBtn = document.getElementById('startBtn');
+            var surrenderBtn = document.getElementById('surrenderBtn');
+
+            function rand(min, max) { return min + Math.random() * (max - min); }
+            function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+            function toast(msg) {
+                var el = document.createElement('div');
+                el.className = 'toast';
+                el.textContent = msg;
+                document.body.appendChild(el);
+                setTimeout(function () { el.remove(); }, 1600);
+            }
+
+            function relocate(el) {
+                var w = el.offsetWidth || 260;
+                var h = el.offsetHeight || 150;
+                var maxX = Math.max(0, window.innerWidth - w - 12);
+                var maxY = Math.max(0, window.innerHeight - h - 90); // 底部给认输按钮留位置
+                el.style.left = Math.floor(rand(0, maxX)) + 'px';
+                el.style.top = Math.floor(rand(0, maxY)) + 'px';
+            }
+
+            function removePopup(el) {
+                var i = popups.indexOf(el);
+                if (i > -1) popups.splice(i, 1);
+                el.remove();
+            }
+
+            function createPopup() {
+                if (popups.length >= MAX_POPUPS) return;
+
+                var tpl = pick(templates);
+                var el = document.createElement('div');
+                el.className = 'popup';
+                el.innerHTML =
+                    '<div class="popup-title"><span>' + tpl.title + '</span><span class="popup-close">✕</span></div>' +
+                    '<div class="popup-body">' + tpl.text + '</div>' +
+                    '<div class="popup-footer"><button class="popup-btn">' + tpl.btn + '</button></div>';
+
+                el.style.zIndex = 10 + popups.length;
+                document.body.appendChild(el);
+                relocate(el);
+                popups.push(el);
+
+                // 关闭按钮：hover 有 60% 概率让整个弹窗逃走
+                var closeBtn = el.querySelector('.popup-close');
+                closeBtn.addEventListener('mouseenter', function () {
+                    if (Math.random() < 0.6) relocate(el);
+                });
+
+                // 关闭按钮：关一个，补两个
+                closeBtn.addEventListener('click', function () {
+                    removePopup(el);
+                    if (popups.length < MAX_POPUPS) {
+                        createPopup();
+                        createPopup();
+                    } else {
+                        toast(pick(closeTaunts));
+                    }
+                    if (popups.length >= 5) surrenderBtn.style.display = 'block';
+                });
+
+                // 弹窗内按钮：只会让你更忙
+                el.querySelector('.popup-btn').addEventListener('click', function () {
+                    toast(pick(btnTaunts));
+                    createPopup();
+                });
+
+                if (popups.length >= 5) surrenderBtn.style.display = 'block';
+            }
+
+            // 开始按钮
+            startBtn.addEventListener('click', function () {
+                card.style.display = 'none';
+                document.body.classList.add('shaking');
+                setTimeout(function () { document.body.classList.remove('shaking'); }, 1700);
+                for (var i = 0; i < 3; i++) createPopup();
+            });
+
+            // 认输按钮：要点 5 次才真的放过你
+            surrenderBtn.addEventListener('click', function () {
+                surrenderClicks++;
+                if (surrenderClicks >= SUR_TEXTS.length) {
+                    finish();
+                    return;
+                }
+                surrenderBtn.textContent = SUR_TEXTS[surrenderClicks];
+                surrenderBtn.style.left = (20 + Math.random() * 60) + '%';
+                createPopup();
+            });
+
+            function finish() {
+                popups.slice().forEach(function (el) { el.remove(); });
+                popups.length = 0;
+                surrenderBtn.style.display = 'none';
+                endingCard.style.display = 'block';
+                document.body.classList.remove('shaking');
+            }
+
+            // 再玩一次
+            document.getElementById('restartBtn').addEventListener('click', function () {
+                location.reload();
+            });
+        })();
+    </script>
+</body>
+
+</html>
