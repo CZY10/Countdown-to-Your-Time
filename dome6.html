@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>离职倒计时</title>
+    <style>
+        * {
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            color: #e8eefc;
+            background: radial-gradient(1100px 700px at 15% -10%, #1e3a6b 0%, #0c1425 55%, #060a11 100%);
+        }
+
+        .app {
+            width: min(580px, 100%);
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 24px;
+            padding: 30px 28px 22px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, .5);
+            backdrop-filter: blur(14px);
+        }
+
+        .tag {
+            display: inline-block;
+            font-size: 13px;
+            letter-spacing: .08em;
+            padding: 5px 12px;
+            border-radius: 999px;
+            background: rgba(80, 180, 255, .16);
+            color: #7ec8ff;
+            border: 1px solid rgba(80, 180, 255, .3);
+        }
+
+        .big {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin: 18px 0 4px
+        }
+
+        .big b {
+            font-size: clamp(56px, 16vw, 88px);
+            line-height: 1;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -.03em;
+            background: linear-gradient(180deg, #fff, #8fb8ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .big span {
+            font-size: 18px;
+            color: #9fb0cc
+        }
+
+        .sub {
+            color: #9fb0cc;
+            font-size: 15px;
+            font-variant-numeric: tabular-nums
+        }
+
+        .bar {
+            height: 8px;
+            border-radius: 99px;
+            background: rgba(255, 255, 255, .1);
+            margin: 20px 0 16px;
+            overflow: hidden
+        }
+
+        .bar i {
+            display: block;
+            height: 100%;
+            width: 0;
+            border-radius: 99px;
+            background: linear-gradient(90deg, #3fd0ff, #7a7cff);
+            transition: width .6s ease
+        }
+
+        .status {
+            font-size: 14px;
+            color: #a9b8d4;
+            min-height: 20px
+        }
+
+        .rows {
+            display: grid;
+            gap: 8px;
+            margin-top: 18px;
+            font-size: 13px;
+            color: #8b9bb8;
+            border-top: 1px solid rgba(255, 255, 255, .08);
+            padding-top: 16px
+        }
+
+        .rows div {
+            display: flex;
+            justify-content: space-between
+        }
+
+        .rows b {
+            color: #dbe6fb;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums
+        }
+
+        .cfg {
+            display: grid;
+            gap: 12px;
+            margin-top: 18px
+        }
+
+        .field {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            font-size: 13px;
+            color: #8b9bb8
+        }
+
+        .field input {
+            background: rgba(255, 255, 255, .07);
+            border: 1px solid rgba(255, 255, 255, .14);
+            color: #e8eefc;
+            border-radius: 10px;
+            padding: 8px 10px;
+            font-size: 13px;
+            font-family: inherit
+        }
+
+        .check {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #8b9bb8;
+            cursor: pointer
+        }
+
+        .check input {
+            width: 16px;
+            height: 16px;
+            accent-color: #3fd0ff;
+            cursor: pointer
+        }
+
+        body.done .big b {
+            background: linear-gradient(180deg, #fff, #5effb0);
+            -webkit-background-clip: text;
+            background-clip: text
+        }
+
+        body.done .bar i {
+            background: linear-gradient(90deg, #39e88a, #7affd0)
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <div class="tag" id="tag">加载中</div>
+
+        <div class="big"><b id="min">--</b><span>分钟</span></div>
+        <div class="sub" id="sub">剩余工作时间</div>
+
+        <div class="bar"><i id="bar"></i></div>
+        <div class="status" id="status">计算中…</div>
+
+        <div class="rows">
+            <div><span>现在时间</span><b id="nowText">--</b></div>
+            <div><span>离职时间</span><b id="resignText">--</b></div>
+        </div>
+
+        <div class="cfg">
+            <label class="field">
+                <span>离职时间</span>
+                <input type="datetime-local" id="resignInput">
+            </label>
+            <label class="check">
+                <input type="checkbox" id="weekdayOnly">
+                <span>只计算周一至周五</span>
+            </label>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            'use strict';
+
+            // 每天的工作时段（分钟表示：9:00-12:00，13:30-18:30）
+            var PERIODS = [[9 * 60, 12 * 60], [13 * 60 + 30, 18 * 60 + 30]];
+            var LS_KEY = 'resign-countdown-target';
+
+            var $ = function (id) { return document.getElementById(id); };
+            var input = $('resignInput');
+            var weekdayOnly = $('weekdayOnly');
+
+            var resignAt = null;
+            var totalSec = 0;
+
+            function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+            function dayStart(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+            function addDays(d, n) { var x = new Date(d.getTime()); x.setDate(x.getDate() + n); return x; }
+            function at(d, mins) {
+                return new Date(d.getFullYear(), d.getMonth(), d.getDate(), Math.floor(mins / 60), mins % 60, 0, 0);
+            }
+            function hm(d) { return pad2(d.getHours()) + ':' + pad2(d.getMinutes()); }
+            function toInput(d) {
+                return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()) +
+                    'T' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+            }
+            // 默认：明天 18:30
+            function defaultResign() {
+                var d = new Date();
+                d.setDate(d.getDate() + 1);
+                d.setHours(18, 30, 0, 0);
+                return d;
+            }
+
+            function isWorkday(d) {
+                if (!weekdayOnly.checked) return true;
+                var w = d.getDay();
+                return w >= 1 && w <= 5;
+            }
+
+            function isWorkingTime(now) {
+                if (!isWorkday(now)) return false;
+                var d = dayStart(now);
+                for (var i = 0; i < PERIODS.length; i++) {
+                    var s = at(d, PERIODS[i][0]);
+                    var e = at(d, PERIODS[i][1]);
+                    if (now >= s && now < e) return true;
+                }
+                return false;
+            }
+
+            // 计算 start → end 之间属于工作时间的秒数
+            function workSecondsBetween(start, end) {
+                if (end <= start) return 0;
+                var total = 0;
+                var d = dayStart(start);
+                var last = dayStart(end);
+                while (d <= last) {
+                    if (isWorkday(d)) {
+                        for (var i = 0; i < PERIODS.length; i++) {
+                            var a = at(d, PERIODS[i][0]);
+                            var b = at(d, PERIODS[i][1]);
+                            var lo = start > a ? start : a;
+                            var hi = end < b ? end : b;
+                            if (hi > lo) total += (hi - lo) / 1000;
+                        }
+                    }
+                    d = addDays(d, 1);
+                }
+                return total;
+            }
+
+            function nextWorkStart(now) {
+                var d = dayStart(now);
+                for (var i = 0; i < 400; i++) {
+                    if (isWorkday(d)) {
+                        for (var j = 0; j < PERIODS.length; j++) {
+                            var s = at(d, PERIODS[j][0]);
+                            if (s.getTime() > now.getTime()) return s;
+                        }
+                    }
+                    d = addDays(d, 1);
+                }
+                return null;
+            }
+
+            function recalcTotal(now) {
+                totalSec = workSecondsBetween(dayStart(now), resignAt);
+            }
+
+            function tick() {
+                var now = new Date();
+                var remainSec = workSecondsBetween(now, resignAt);
+                var remainMin = Math.ceil(remainSec / 60);
+                if (remainMin < 0) remainMin = 0;
+
+                $('min').textContent = remainMin;
+                $('sub').textContent = '剩余工作时间 · 约 ' +
+                    Math.floor(remainMin / 60) + ' 小时 ' + (remainMin % 60) + ' 分钟';
+
+                $('nowText').textContent = now.getFullYear() + '-' + pad2(now.getMonth() + 1) + '-' +
+                    pad2(now.getDate()) + ' ' + pad2(now.getHours()) + ':' + pad2(now.getMinutes()) +
+                    ':' + pad2(now.getSeconds());
+                $('resignText').textContent = resignAt.getFullYear() + '-' + pad2(resignAt.getMonth() + 1) +
+                    '-' + pad2(resignAt.getDate()) + ' ' + hm(resignAt);
+
+                var pct;
+                if (totalSec > 0) {
+                    pct = (1 - remainSec / totalSec) * 100;
+                } else {
+                    pct = remainSec <= 0 ? 100 : 0;
+                }
+                if (pct < 0) pct = 0;
+                if (pct > 100) pct = 100;
+                $('bar').style.width = pct.toFixed(2) + '%';
+
+                if (remainSec <= 0) {
+                    document.body.classList.add('done');
+                    $('tag').textContent = '🎉 自由了';
+                    $('status').textContent = '已到离职时间，倒计时结束。';
+                } else if (isWorkingTime(now)) {
+                    document.body.classList.remove('done');
+                    $('tag').textContent = '工作中';
+                    $('status').textContent = '倒计时进行中，每过一分钟减少 1 分钟。';
+                } else {
+                    document.body.classList.remove('done');
+                    var nxt = nextWorkStart(now);
+                    $('tag').textContent = '暂停中';
+                    $('status').textContent = nxt
+                        ? '非工作时间，倒计时暂停。下次开始：' + hm(nxt)
+                        : '非工作时间，倒计时暂停。';
+                }
+            }
+
+            function applyTarget(d) {
+                resignAt = d;
+                input.value = toInput(d);
+                try { localStorage.setItem(LS_KEY, d.toISOString()); } catch (e) { }
+                recalcTotal(new Date());
+                tick();
+            }
+
+            function init() {
+                var saved = null;
+                try { saved = localStorage.getItem(LS_KEY); } catch (e) { }
+                var d = saved ? new Date(saved) : null;
+                if (!d || isNaN(d.getTime())) d = defaultResign();
+                applyTarget(d);
+
+                input.addEventListener('change', function () {
+                    var v = new Date(input.value);
+                    if (isNaN(v.getTime())) return;
+                    applyTarget(v);
+                });
+
+                weekdayOnly.addEventListener('change', function () {
+                    recalcTotal(new Date());
+                    tick();
+                });
+
+                setInterval(tick, 1000);
+            }
+
+            init();
+        })();
+    </script>
+</body>
+
+</html>
